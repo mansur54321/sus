@@ -7,9 +7,9 @@ BLUE="\e[34m"
 RESET="\e[0m"
 
 # URL-адреса для скрипта и файла устройств на GitHub
-GITHUB_REPO_URL="github.com/mansur54321/sus/tree/main"
-OTA_DOWNLOADER_URL="${GITHUB_REPO_URL}/ota_downloader.sh"
-DEVICES_FILE_URL="${GITHUB_REPO_URL}/devices.txt"
+
+OTA_DOWNLOADER_URL="https://raw.githubusercontent.com/mansur54321/sus/refs/heads/main/ota_downloader.sh"
+DEVICES_FILE_URL="https://raw.githubusercontent.com/mansur54321/sus/refs/heads/main/devices.txt"
 
 # Функция для вывода сообщений
 print_message() {
