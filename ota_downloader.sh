@@ -243,7 +243,7 @@ while true; do
     echo -e "     → More > Select URL"
     echo -e "     → ${PURPLE}Tap to copy the link${RESET}, ${BLUE}long press to open in browser${RESET}"
     echo -e "❌ 0 - End script"
-    read -p "💡 Select an option (1/2/3): " option
+    read -p "💡 Select an option (1/2/3/0): " option
     case "$option" in
         1)
             read -p "📌 Manifest + OTA version : " input
@@ -271,3 +271,7 @@ while true; do
             ;;
     esac
 done
+
+
+
+
