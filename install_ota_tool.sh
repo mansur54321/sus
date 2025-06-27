@@ -52,7 +52,6 @@ install_termux() {
     print_message "Обнаружен Termux. Установка зависимостей..."
     pkg update && pkg upgrade -y
     pkg install python python-pip git -y
-    # В Termux обычно уже есть python3 как 'python'
     # pkg install python3 python3-pip git -y # Заменил на 'python'
 }
 
