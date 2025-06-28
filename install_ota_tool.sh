@@ -8,8 +8,8 @@ RED="\e[31m"
 RESET="\e[0m"
 
 # URL-адреса для скрипта и файла устройств на GitHub
-OTA_FINDER_URL="https://github.com/mansur54321/sus/blob/main/ota_downloader.sh"
-DEVICES_FILE_URL="https://raw.githubusercontent.com/mansur54321/sus/main/devices.txt"
+OTA_DOWNLOADER_URL="https://raw.githubusercontent.com/mansur54321/sus/refs/heads/main/ota_downloader.sh"
+DEVICES_FILE_URL="https://raw.githubusercontent.com/mansur54321/sus/refs/heads/main/devices.txt"
 REALME_OTA_REPO="https://github.com/R0rt1z2/realme-ota.git"
 
 # --- Функции ---
@@ -29,14 +29,14 @@ print_warning() {
     echo -e "${YELLOW}[WARN] $1${RESET}"
 }
 
-# Функция для установки на Debian/Ubuntu
+# --- Логика установки для разных ОС ---
+
 install_debian() {
     print_message "Обнаружен дистрибутив на базе Debian. Установка зависимостей..."
     sudo apt update && sudo apt install python3 python3-pip python3-venv git curl -y
     PYTHON_CMD="python3"
 }
 
-# Функция для установки на Arch Linux
 install_arch() {
     print_message "Обнаружен дистрибутив на базе Arch. Установка зависимостей..."
     sudo pacman -Syu --noconfirm
@@ -44,7 +44,6 @@ install_arch() {
     PYTHON_CMD="python"
 }
 
-# Функция для установки на Fedora
 install_fedora() {
     print_message "Обнаружен дистрибутив на базе Fedora. Установка зависимостей..."
     sudo dnf check-update
@@ -52,7 +51,6 @@ install_fedora() {
     PYTHON_CMD="python3"
 }
 
-# Функция для установки на Termux
 install_termux() {
     print_message "Обнаружен Termux. Установка зависимостей..."
     pkg update && pkg upgrade -y
@@ -60,52 +58,45 @@ install_termux() {
     PYTHON_CMD="python"
 }
 
-# Функция для проверки и установки в Git Bash for Windows
 install_windows() {
     print_message "Обнаружен Git Bash для Windows. Проверка зависимостей..."
     PYTHON_CMD="python"
     
-    # Проверка наличия Python
     if ! command -v python &> /dev/null; then
         print_error "Python не найден!"
         print_warning "Пожалуйста, установите Python для Windows с сайта python.org"
         print_warning "ВАЖНО: Во время установки обязательно поставьте галочку 'Add Python to PATH'."
         exit 1
-    else
-        print_message "Python найден."
     fi
+    print_message "Python найден."
 
-    # Проверка наличия Git (должен быть, т.к. это Git Bash)
     if ! command -v git &> /dev/null; then
         print_error "Git не найден! Пожалуйста, переустановите Git for Windows."
         exit 1
-    else
-        print_message "Git найден."
     fi
+    print_message "Git найден."
     
-    # Проверка наличия curl (обычно есть в Git Bash)
     if ! command -v curl &> /dev/null; then
         print_error "cURL не найден! Пожалуйста, переустановите Git for Windows, выбрав компонент cURL."
         exit 1
-    else
-        print_message "cURL найден."
     fi
+    print_message "cURL найден."
 }
 
-# --- Основная логика ---
+# --- Основная логика скрипта ---
 
-# Определение дистрибутива и установка зависимостей
+# 1. Определение ОС
 OS=""
-PYTHON_CMD="python3" # По умолчанию
+PYTHON_CMD="python3" # Значение по умолчанию
 
-if [ -f /etc/os-release ]; then
+if [[ "$(uname -o)" == "Msys" ]]; then
+    OS="windows"
+elif [ -f /etc/os-release ]; then
     . /etc/os-release
     OS=$ID
     if [[ "$ID_LIKE" == *"termux"* ]]; then
         OS="termux"
     fi
-elif [[ "$(uname -o)" == "Msys" ]]; then
-    OS="windows"
 elif [ -d "/data/data/com.termux" ]; then
     OS="termux"
 else
@@ -113,6 +104,7 @@ else
     exit 1
 fi
 
+# 2. Установка зависимостей и определение переменных для конкретной ОС
 case "$OS" in
     "debian" | "ubuntu") install_debian ;;
     "arch") install_arch ;;
@@ -125,38 +117,45 @@ case "$OS" in
         ;;
 esac
 
-# Обработка существующей папки realme-ota
-if [ -d "$HOME/realme-ota" ]; then
+# 3. Определение правильного пути для активации venv
+VENV_ACTIVATE_PATH="venv/bin/activate" # По умолчанию для Linux/Termux
+if [ "$OS" == "windows" ]; then
+    VENV_ACTIVATE_PATH="venv/Scripts/activate" # Путь для Windows
+fi
+
+# 4. Обработка существующей папки realme-ota
+INSTALL_DIR="$HOME/realme-ota"
+if [ -d "$INSTALL_DIR" ]; then
     print_warning "Папка 'realme-ota' уже существует в вашем домашнем каталоге."
     read -p "$(echo -e "${YELLOW}Вы хотите обновить (u), переустановить (r) или пропустить (s)? [u/r/s]: ${RESET}")" choice
     case "$choice" in
         u|U )
             print_message "Обновление существующей установки..."
-            cd "$HOME/realme-ota" || { print_error "Не удалось перейти в каталог realme-ota. Выход."; exit 1; }
+            cd "$INSTALL_DIR" || { print_error "Не удалось перейти в каталог. Выход."; exit 1; }
             git pull || { print_error "Не удалось обновить репозиторий."; exit 1; }
             ;;
         r|R )
-            print_warning "Удаление существующей папки 'realme-ota'..."
-            rm -rf "$HOME/realme-ota" || { print_error "Не удалось удалить папку. Проверьте права доступа."; exit 1; }
+            print_warning "Удаление существующей папки '$INSTALL_DIR'..."
+            rm -rf "$INSTALL_DIR" || { print_error "Не удалось удалить папку. Проверьте права доступа."; exit 1; }
             print_message "Клонирование репозитория заново..."
-            git clone "$REALME_OTA_REPO" "$HOME/realme-ota" || { print_error "Не удалось клонировать репозиторий. Выход."; exit 1; }
-            cd "$HOME/realme-ota" || { print_error "Не удалось перейти в каталог realme-ota. Выход."; exit 1; }
+            git clone "$REALME_OTA_REPO" "$INSTALL_DIR" || { print_error "Не удалось клонировать репозиторий. Выход."; exit 1; }
+            cd "$INSTALL_DIR" || { print_error "Не удалось перейти в каталог. Выход."; exit 1; }
             ;;
         * )
             print_message "Пропускаем клонирование. Используется существующая папка."
-            cd "$HOME/realme-ota" || { print_error "Не удалось перейти в каталог realme-ota. Выход."; exit 1; }
+            cd "$INSTALL_DIR" || { print_error "Не удалось перейти в каталог. Выход."; exit 1; }
             ;;
     esac
 else
-    print_message "Клонирование репозитория realme-ota в $HOME/realme-ota..."
-    git clone "$REALME_OTA_REPO" "$HOME/realme-ota" || { print_error "Не удалось клонировать репозиторий. Выход."; exit 1; }
-    cd "$HOME/realme-ota" || { print_error "Не удалось перейти в каталог realme-ota. Выход."; exit 1; }
+    print_message "Клонирование репозитория realme-ota в $INSTALL_DIR..."
+    git clone "$REALME_OTA_REPO" "$INSTALL_DIR" || { print_error "Не удалось клонировать репозиторий. Выход."; exit 1; }
+    cd "$INSTALL_DIR" || { print_error "Не удалось перейти в каталог. Выход."; exit 1; }
 fi
 
-# Настройка виртуальной среды и установка пакетов
+# 5. Настройка виртуальной среды и установка пакетов
 print_message "Настройка виртуальной среды Python..."
 $PYTHON_CMD -m venv venv
-source venv/bin/activate
+source "$VENV_ACTIVATE_PATH"
 
 print_message "Установка пакета realme-ota из локального репозитория..."
 pip install . || {
@@ -165,22 +164,22 @@ pip install . || {
 }
 deactivate # Временно деактивируем для чистоты
 
-# Загрузка вспомогательных файлов
-print_message "Загрузка скрипта ota_finder.sh..."
-curl -L -o ota_finder.sh "$OTA_FINDER_URL" || { print_error "Не удалось загрузить ota_finder.sh. Выход."; exit 1; }
-chmod +x ota_finder.sh
+# 6. Загрузка вспомогательных файлов
+print_message "Загрузка скрипта ota_downloader.sh..."
+curl -L -o ota_downloader.sh "$OTA_DOWNLOADER_URL" || { print_error "Не удалось загрузить ota_downloader.sh. Выход."; exit 1; }
+chmod +x ota_downloader.sh
 
 print_message "Загрузка файла devices.txt..."
 curl -L -o devices.txt "$DEVICES_FILE_URL" || { print_error "Не удалось загрузить devices.txt. Выход."; exit 1; }
 
-# Настройка псевдонима (alias)
+# 7. Настройка псевдонима (alias)
 print_message "Настройка псевдонима 'ota' в ~/.bashrc..."
 # Удаляем старый псевдоним, если он существует, чтобы избежать дублирования
-sed -i "/alias ota=/d" ~/.bashrc
-# Добавляем новый псевдоним, который переходит в папку, активирует venv и запускает скрипт
-echo "alias ota='cd \"\$HOME/realme-ota\" && source venv/bin/activate && bash ota_finder.sh'" >> ~/.bashrc
+sed -i.bak "/alias ota=/d" ~/.bashrc
+# Добавляем новый псевдоним с ПРАВИЛЬНЫМ путем активации для вашей ОС
+echo "alias ota='cd \"$INSTALL_DIR\" && source \"$VENV_ACTIVATE_PATH\" && bash ota_downloader.sh'" >> ~/.bashrc
 
-# Завершение установки
+# 8. Завершение установки
 print_message "\n${BLUE}Установка успешно завершена!${RESET}"
 print_message "Чтобы изменения вступили в силу, перезапустите терминал или выполните команду:"
 print_message "${YELLOW}source ~/.bashrc${RESET}"
