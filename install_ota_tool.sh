@@ -8,7 +8,7 @@ RED="\e[31m"
 RESET="\e[0m"
 
 # URL-адреса для скрипта и файла устройств на GitHub
-OTA_FINDER_URL="https://raw.githubusercontent.com/mansur54321/sus/main/ota_finder.sh" # Изменил имя на более подходящее
+OTA_FINDER_URL="https://github.com/mansur54321/sus/blob/main/ota_downloader.sh"
 DEVICES_FILE_URL="https://raw.githubusercontent.com/mansur54321/sus/main/devices.txt"
 REALME_OTA_REPO="https://github.com/R0rt1z2/realme-ota.git"
 
