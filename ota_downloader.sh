@@ -61,11 +61,10 @@ run_ota() {
     echo -e "🛠 OTA version: ${BLUE}${VERSIONS[$version]}${RESET}"
     echo -e "🛠 Server: ${GREEN}$server${RESET}"
 
-    # --- FIXED LINE ---
     # We call Python directly as a module (-m), which is much more reliable
+    export PYTHONUTF8=1
     ota_command="python -m realme_ota.main $server $device_model ${ota_model}_11.${version}.01_0001_100001010000 6 $nv_id"
-    # ------------------
-
+    
     echo -e "🔍 Running: ${BLUE}$ota_command${RESET}"
     output=$(eval "$ota_command")
 
