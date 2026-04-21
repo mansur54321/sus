@@ -18,7 +18,7 @@ Powered by [realme-ota](https://github.com/R0rt1z2/realme-ota) by R0rt1z2.
 ## Quick Install (Linux/Windows)
 
 ```bash
-bash <(curl -sL https://raw.githubusercontent.com/mansur54321/sus/main/install_ota_tool.sh)
+bash <(curl -sL https://raw.githubusercontent.com/mansur54321/oplus_ota/main/install_ota_tool.sh)
 ```
 
 After installation, restart your terminal and run:
@@ -30,7 +30,7 @@ ota
 ## Termux Install (Android)
 
 ```bash
-bash <(curl -sL https://raw.githubusercontent.com/mansur54321/sus/main/termux/setup_termux.sh)
+bash <(curl -sL https://raw.githubusercontent.com/mansur54321/oplus_ota/main/termux/setup_termux.sh)
 ```
 
 Add **Termux Widget** to your home screen, tap **Oplus_OTA** to launch.

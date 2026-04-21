@@ -6,10 +6,10 @@ BLUE="\e[34m"
 RED="\e[31m"
 RESET="\e[0m"
 
-OTA_DOWNLOADER_URL="https://raw.githubusercontent.com/mansur54321/sus/refs/heads/main/ota_downloader.sh"
-DEVICES_FILE_URL="https://raw.githubusercontent.com/mansur54321/sus/refs/heads/main/devices.txt"
+OTA_DOWNLOADER_URL="https://raw.githubusercontent.com/mansur54321/oplus_ota/refs/heads/main/ota_downloader.sh"
+DEVICES_FILE_URL="https://raw.githubusercontent.com/mansur54321/oplus_ota/refs/heads/main/devices.txt"
 REALME_OTA_REPO="https://github.com/R0rt1z2/realme-ota.git"
-REPO_URL="https://github.com/mansur54321/sus"
+REPO_URL="https://github.com/mansur54321/oplus_ota"
 
 print_message() { echo -e "${GREEN}[INFO] $1${RESET}"; }
 print_error() { echo -e "${RED}[ERROR] $1${RESET}"; }

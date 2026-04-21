@@ -1,7 +1,7 @@
 #!/bin/bash
 
-GITHUB_RAW_URL_OTA="https://raw.githubusercontent.com/mansur54321/sus/refs/heads/main/ota_downloader.sh"
-GITHUB_RAW_URL_DEVICES="https://raw.githubusercontent.com/mansur54321/sus/refs/heads/main/devices.txt"
+GITHUB_RAW_URL_OTA="https://raw.githubusercontent.com/mansur54321/oplus_ota/refs/heads/main/ota_downloader.sh"
+GITHUB_RAW_URL_DEVICES="https://raw.githubusercontent.com/mansur54321/oplus_ota/refs/heads/main/devices.txt"
 REALME_OTA_REPO="https://github.com/R0rt1z2/realme-ota.git"
 
 LOG="$HOME/termux_setup.log"
